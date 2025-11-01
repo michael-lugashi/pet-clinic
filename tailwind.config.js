@@ -1,19 +1,20 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
   theme: {
     colors: {
-      primary: "#4D4DFE",
+      "dark-purple": "#7b3aed",
+      "light-purple": "#fcf3fb",
+      black: "#1a1a1a",
+      gray: "#757575",
+      white: "#ffffff"
     },
     fontFamily: {
-      mono: ["Roboto", "monospace"],
-      sans: ["Roboto", "sans-serif"],
-      serif: ["Roboto", "sans-serif"],
-      display: ["Roboto", "sans-serif"],
-      body: ["Roboto", "sans-serif"],
+      mono: ["Segoe UI", "monospace"],
+      sans: ["Segoe UI", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+      serif: ["Segoe UI", "sans-serif"],
+      display: ["Segoe UI", "sans-serif"],
+      body: ["Segoe UI", "sans-serif"],
     },
     extend: {
       gridTemplateRows: {
