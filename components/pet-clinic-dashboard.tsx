@@ -1,8 +1,8 @@
 import Plus from "svg/Plus";
 import Edit from "svg/Edit";
 import Delete from "svg/Delete";
-import Keyboard from "svg/Keyboard";
 import Header from "./header";
+import KeyboardShortcutsHint from "./keyboard-shortcuts-hint";
 import Table, { TableRef } from "./table/table";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Patient, PetType } from "@/lib/interfaces";
@@ -342,15 +342,7 @@ export const PetClinicDashboard = () => {
               <div className="p-4 text-center text-gray">No patients match this search</div>
             )}
           </Card>
-          <div className="mt-4 flex justify-center">
-            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-black/10 text-gray text-sm">
-              <Keyboard className="h-5 w-5" />
-              <span>Keyboard shortcuts:</span>
-              <kbd className="px-2 py-1 text-xs font-mono bg-light-purple border border-purple/20 rounded shadow-sm">
-                ?
-              </kbd>
-            </div>
-          </div>
+          <KeyboardShortcutsHint />
         </div>
       </div>
 
