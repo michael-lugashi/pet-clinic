@@ -10,7 +10,6 @@ interface DropdownSelectProps<T> {
   selectedValue: T | null;
   onSelect: (value: T | null) => void;
   trigger: React.ReactNode;
-  placeholder?: string;
   showAllOption?: boolean;
   allOptionLabel?: string;
   className?: string;
@@ -22,7 +21,6 @@ const DropdownSelect = <T,>({
   selectedValue,
   onSelect,
   trigger,
-  placeholder = "Select...",
   showAllOption = false,
   allOptionLabel = "All",
   className = "",
@@ -33,6 +31,7 @@ const DropdownSelect = <T,>({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      event.stopPropagation();
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
@@ -55,6 +54,7 @@ const DropdownSelect = <T,>({
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-lg text-gray hover:bg-light-purple transition-colors"
       >
@@ -66,6 +66,7 @@ const DropdownSelect = <T,>({
         >
           {showAllOption && (
             <button
+              type="button"
               onClick={() => handleSelect(null)}
               className={`w-full text-left px-4 py-2 hover:bg-gray/5 transition-colors ${
                 selectedValue === null ? "bg-dark-purple/10 text-dark-purple font-medium" : "text-black"
@@ -76,6 +77,7 @@ const DropdownSelect = <T,>({
           )}
           {options.map((option, index) => (
             <button
+              type="button"
               key={index}
               onClick={() => handleSelect(option.value)}
               className={`w-full text-left px-4 py-2 hover:bg-gray/5 transition-colors ${
