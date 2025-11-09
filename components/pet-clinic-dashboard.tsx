@@ -4,10 +4,15 @@ import Delete from "svg/Delete";
 import Header from "./header";
 import Table from "./table/table";
 import { useQuery } from "@tanstack/react-query";
-import { Patient } from "@/lib/interfaces";
+import { Patient, PetType } from "@/lib/interfaces";
 import type { Header as TableHeader } from "./table/table";
 import Card from "./card";
 import ClickableSvg from "./clickable-svg";
+import SearchBar from "./search-bar";
+import PetTypeFilter from "./pet-type-filter";
+import { useAvailablePetTypes } from "@/hooks/useAvailablePetTypes";
+import { useFilteredPatients } from "@/hooks/useFilteredPatients";
+import { formatPhone } from "@/utils/formatPhone";
 
 const getPatients = async (): Promise<Patient[]> => {
   const response = await fetch("/api/patients");
@@ -16,14 +21,6 @@ const getPatients = async (): Promise<Patient[]> => {
   }
   const data: { patients: Patient[] } = await response.json();
   return data.patients;
-};
-
-const formatPhone = (phone: string): string => {
-  const cleaned = phone.replace(/\D/g, "");
-  if (cleaned.length === 10) {
-    return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
-  }
-  return phone;
 };
 
 const headers: TableHeader<Patient>[] = [
@@ -88,6 +85,10 @@ export const PetClinicDashboard = () => {
     queryFn: getPatients,
   });
 
+  const availablePetTypes = useAvailablePetTypes(patients);
+  const { filteredPatients, searchQuery, setSearchQuery, selectedPetType, setSelectedPetType } =
+    useFilteredPatients(patients);
+
   return (
     <div className="bg-light-purple min-h-screen w-full">
       <div className="flex flex-col gap-y-4 p-4 md:p-8 max-w-screen-2xl mx-auto">
@@ -101,9 +102,25 @@ export const PetClinicDashboard = () => {
           buttonFrontAdornment={<Plus className="h-4 w-4" />}
         />
         <Card>
+          <div className="flex gap-3 mb-4">
+            <SearchBar
+              className="flex-grow"
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search by name, phone, pet name, type, or age..."
+            />
+            <PetTypeFilter
+              selectedType={selectedPetType}
+              onSelectType={setSelectedPetType}
+              availableTypes={availablePetTypes}
+            />
+          </div>
           {isLoading && <div className="p-4">Loading...</div>}
           {isError && <div className="p-4 text-red-600">Error: {error.message}</div>}
-          {patients && <Table headers={headers} rows={patients} />}
+          {patients && filteredPatients.length > 0 && <Table headers={headers} rows={filteredPatients} />}
+          {patients && filteredPatients.length === 0 && (
+            <div className="p-4 text-center text-gray">No patients match this search</div>
+          )}
         </Card>
       </div>
     </div>
