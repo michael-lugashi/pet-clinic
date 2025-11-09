@@ -1,4 +1,3 @@
-
 type ButtonProps = {
   children: React.ReactNode;
   onClick: () => void;
@@ -8,7 +7,10 @@ type ButtonProps = {
 
 const Button = ({ children, onClick, frontAdornment, backAdornment }: ButtonProps) => {
   return (
-    <button className="bg-dark-purple text-white px-4 py-2 rounded-lg hover:bg-dark-purple/80 transition-colors duration-300 flex items-center gap-2" onClick={onClick}>
+    <button
+      className="bg-dark-purple text-white px-4 py-2 rounded-lg hover:bg-dark-purple/80 hover:scale-105 transition-all duration-300 flex items-center gap-2"
+      onClick={onClick}
+    >
       {frontAdornment}
       {children}
       {backAdornment}
