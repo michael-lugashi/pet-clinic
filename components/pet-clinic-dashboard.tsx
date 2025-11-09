@@ -1,8 +1,9 @@
 import Plus from "svg/Plus";
 import Edit from "svg/Edit";
 import Delete from "svg/Delete";
+import Keyboard from "svg/Keyboard";
 import Header from "./header";
-import Table from "./table/table";
+import Table, { TableRef } from "./table/table";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Patient, PetType } from "@/lib/interfaces";
 import type { Header as TableHeader } from "./table/table";
@@ -16,7 +17,11 @@ import { useFilteredPatients } from "@/hooks/useFilteredPatients";
 import { formatPhone } from "@/utils/formatPhone";
 import PatientFormModal from "./patient-form-modal";
 import DeleteConfirmModal from "./delete-confirm-modal";
-import { useState } from "react";
+import KeyboardShortcutsModal, { KeyboardShortcut } from "./keyboard-shortcuts-modal";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import Button from "./button";
+import { useState, useRef, useMemo } from "react";
+import { DropdownSelectRef } from "./dropdown-select";
 
 const getPatients = async (): Promise<Patient[]> => {
   const response = await fetch("/api/patients");
@@ -66,9 +71,15 @@ export const PetClinicDashboard = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isKeyboardShortcutsOpen, setIsKeyboardShortcutsOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [focusedRowIndex, setFocusedRowIndex] = useState(-1);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const queryClient = useQueryClient();
+  const tableRef = useRef<TableRef>(null);
+  const searchBarRef = useRef<HTMLInputElement>(null);
+  const petTypeFilterRef = useRef<DropdownSelectRef>(null);
 
   const {
     data: patients,
@@ -141,6 +152,103 @@ export const PetClinicDashboard = () => {
     }
   };
 
+  const handleRowAction = (row: Patient, action: "edit" | "delete") => {
+    if (action === "edit") {
+      handleEditClick(row);
+    } else {
+      handleDeleteClick(row);
+    }
+  };
+
+  // Define keyboard shortcuts
+  const keyboardShortcuts: KeyboardShortcut[] = useMemo(
+    () => [
+      { key: "?", description: "Show keyboard shortcuts", category: "General" },
+      { key: "N", description: "Add new patient", category: "Actions" },
+      { key: "/", description: "Focus search bar", category: "Navigation" },
+      { key: "F", description: "Toggle pet type filter", category: "Navigation" },
+      { key: "↑ / ↓", description: "Navigate table rows", category: "Navigation" },
+      { key: "E", description: "Edit focused patient", category: "Actions" },
+      { key: "D", description: "Delete focused patient", category: "Actions" },
+      { key: "Tab", description: "Cycle through sort columns (forward)", category: "Table" },
+      { key: "Shift + Tab", description: "Cycle through sort columns (backward)", category: "Table" },
+      { key: "Escape", description: "Close modal / Clear focus", category: "General" },
+    ],
+    []
+  );
+
+  // Check if any modal is open
+  const isAnyModalOpen =
+    isAddModalOpen || isEditModalOpen || isDeleteModalOpen || isKeyboardShortcutsOpen || isFilterOpen;
+
+  // Setup keyboard shortcut handlers
+  useKeyboardShortcuts([
+    {
+      key: "?",
+      shiftKey: true,
+      handler: () => setIsKeyboardShortcutsOpen(true),
+      enabled: !isAnyModalOpen,
+    },
+    {
+      key: "/",
+      handler: () => searchBarRef.current?.focus(),
+      enabled: !isAnyModalOpen,
+    },
+    {
+      key: "n",
+      handler: handleAddClick,
+      enabled: !isAnyModalOpen,
+    },
+    {
+      key: "f",
+      handler: () => petTypeFilterRef.current?.toggle(),
+      enabled: !isAnyModalOpen,
+    },
+    {
+      key: "ArrowDown",
+      handler: () => tableRef.current?.focusNextRow(),
+      enabled: !isAnyModalOpen && filteredPatients.length > 0,
+    },
+    {
+      key: "ArrowUp",
+      handler: () => tableRef.current?.focusPreviousRow(),
+      enabled: !isAnyModalOpen && filteredPatients.length > 0,
+    },
+    {
+      key: "e",
+      handler: () => tableRef.current?.triggerAction("edit"),
+      enabled: !isAnyModalOpen,
+    },
+    {
+      key: "d",
+      handler: () => tableRef.current?.triggerAction("delete"),
+      enabled: !isAnyModalOpen,
+    },
+    {
+      key: "Tab",
+      handler: () => tableRef.current?.cycleSortColumns("next"),
+      enabled: !isAddModalOpen && !isEditModalOpen && !isDeleteModalOpen && !isKeyboardShortcutsOpen,
+    },
+    {
+      key: "Tab",
+      shiftKey: true,
+      handler: () => tableRef.current?.cycleSortColumns("previous"),
+      enabled: !isAddModalOpen && !isEditModalOpen && !isDeleteModalOpen && !isKeyboardShortcutsOpen,
+    },
+    {
+      key: "Escape",
+      handler: () => {
+        if (isFilterOpen) {
+          setIsFilterOpen(false);
+        } else {
+          setFocusedRowIndex(-1);
+        }
+      },
+      preventDefault: false,
+      enabled: !isAddModalOpen && !isEditModalOpen && !isDeleteModalOpen && !isKeyboardShortcutsOpen,
+    },
+  ]);
+
   const headers: TableHeader<Patient>[] = [
     {
       title: "Client Name",
@@ -202,24 +310,47 @@ export const PetClinicDashboard = () => {
           <Card>
             <div className="flex gap-3 mb-4">
               <SearchBar
+                ref={searchBarRef}
                 className="flex-grow"
                 value={searchQuery}
                 onChange={setSearchQuery}
                 placeholder="Search by name, phone, pet name, type, or age..."
               />
               <PetTypeFilter
+                ref={petTypeFilterRef}
                 selectedType={selectedPetType}
                 onSelectType={setSelectedPetType}
                 availableTypes={availablePetTypes}
+                onOpenChange={setIsFilterOpen}
               />
             </div>
             {isLoading && <div className="p-4">Loading...</div>}
             {isError && <div className="p-4 text-red-600">Error: {error.message}</div>}
-            {patients && filteredPatients.length > 0 && <Table headers={headers} rows={filteredPatients} />}
+            {patients && filteredPatients.length > 0 && (
+              <>
+                <Table
+                  ref={tableRef}
+                  headers={headers}
+                  rows={filteredPatients}
+                  focusedRowIndex={focusedRowIndex}
+                  onRowFocus={setFocusedRowIndex}
+                  onRowAction={handleRowAction}
+                />
+              </>
+            )}
             {patients && filteredPatients.length === 0 && (
               <div className="p-4 text-center text-gray">No patients match this search</div>
             )}
           </Card>
+          <div className="mt-4 flex justify-center">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-black/10 text-gray text-sm">
+              <Keyboard className="h-5 w-5" />
+              <span>Keyboard shortcuts:</span>
+              <kbd className="px-2 py-1 text-xs font-mono bg-light-purple border border-purple/20 rounded shadow-sm">
+                ?
+              </kbd>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -250,6 +381,12 @@ export const PetClinicDashboard = () => {
         onConfirm={handleDeleteConfirm}
         patient={selectedPatient}
         isLoading={deleteMutation.isPending}
+      />
+
+      <KeyboardShortcutsModal
+        isOpen={isKeyboardShortcutsOpen}
+        onClose={() => setIsKeyboardShortcutsOpen(false)}
+        shortcuts={keyboardShortcuts}
       />
     </>
   );
