@@ -31,7 +31,7 @@ const getPatients = async (): Promise<Patient[]> => {
   return data.patients;
 };
 
-const createPatient = async (patient: Omit<Patient, "id">): Promise<Patient> => {
+const createPatient = async (patient: Omit<Patient, "_id">): Promise<Patient> => {
   const response = await fetch("/api/patients", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -57,7 +57,7 @@ const updatePatient = async (patient: Patient): Promise<Patient> => {
   return data.patients;
 };
 
-const deletePatient = async (id: number): Promise<void> => {
+const deletePatient = async (id: string): Promise<void> => {
   const response = await fetch(`/api/patients?id=${id}`, {
     method: "DELETE",
   });
@@ -135,19 +135,19 @@ export const PetClinicDashboard = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleAddSubmit = (patient: Omit<Patient, "id">) => {
+  const handleAddSubmit = (patient: Omit<Patient, "_id">) => {
     createMutation.mutate(patient);
   };
 
-  const handleEditSubmit = (patient: Omit<Patient, "id">) => {
+  const handleEditSubmit = (patient: Omit<Patient, "_id">) => {
     if (selectedPatient) {
-      updateMutation.mutate({ ...patient, id: selectedPatient.id });
+      updateMutation.mutate({ ...patient, _id: selectedPatient._id });
     }
   };
 
   const handleDeleteConfirm = () => {
     if (selectedPatient) {
-      deleteMutation.mutate(selectedPatient.id);
+      deleteMutation.mutate(selectedPatient._id);
     }
   };
 
@@ -281,7 +281,7 @@ export const PetClinicDashboard = () => {
     },
     {
       title: "Actions",
-      key: "id",
+      key: "_id",
       displayFn: (value, row) => (
         <div className="flex items-center gap-3">
           <ClickableSvg onClick={() => handleEditClick(row)} className="text-black/80" ariaLabel="Edit">
