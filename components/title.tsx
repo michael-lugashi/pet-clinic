@@ -1,6 +1,15 @@
-export const Title = () => {
+type TitleProps = {
+  title: string;
+  subtitle: string;
+};
+
+const Title = ({ title, subtitle }: TitleProps) => {
   return (
-    <h1 className="text-primary font-bold text-3xl">Pet Clinic Dashboard</h1>
+    <div>
+      <h1 className="text-black font-semibold mb-2 text-2xl">{title}</h1>
+      <h2 className="text-gray text-md">{subtitle}</h2>
+    </div>
   );
 };
 
+export default Title;
