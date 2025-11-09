@@ -7,7 +7,8 @@ module.exports = {
       "light-purple": "#fcf3fb",
       black: "#1a1a1a",
       gray: "#757575",
-      white: "#ffffff"
+      white: "#ffffff",
+      red: "#D4183D",
     },
     fontFamily: {
       mono: ["Segoe UI", "monospace"],
