@@ -21,4 +21,3 @@ export const useHandleEscape = (isEnabled: boolean, onEscape: () => void) => {
     };
   }, [isEnabled, onEscape]);
 };
-

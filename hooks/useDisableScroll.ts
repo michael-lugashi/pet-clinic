@@ -17,4 +17,3 @@ export const useDisableScroll = (disabled: boolean) => {
     };
   }, [disabled]);
 };
-
