@@ -7,7 +7,7 @@ import FormTextBox from "./form-text-box";
 interface PatientFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (patient: Omit<Patient, "id">) => void;
+  onSubmit: (patient: Omit<Patient, "_id">) => void;
   patient?: Patient | null;
   isLoading?: boolean;
 }
@@ -21,7 +21,7 @@ const petTypeOptions: { value: PetType; label: string }[] = [
 ];
 
 interface FormField {
-  id: keyof Omit<Patient, "id" | "petType">;
+  id: keyof Omit<Patient, "_id" | "petType" | "createdAt" | "updatedAt">;
   label: string;
   type: string;
   placeholder: string;
