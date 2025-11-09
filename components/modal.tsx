@@ -2,6 +2,7 @@ import React from "react";
 import { createPortal } from "react-dom";
 import { useDisableScroll } from "@/hooks/useDisableScroll";
 import { useHandleEscape } from "@/hooks/useHandleEscape";
+import { useModalKeyboardNav } from "@/hooks/useModalKeyboardNav";
 import ClickableSvg from "./clickable-svg";
 import X from "svg/X";
 
@@ -17,6 +18,7 @@ interface ModalProps {
 const Modal = ({ isOpen, onClose, children, title, className = "", closeOnOverlayClick = true }: ModalProps) => {
   useDisableScroll(isOpen);
   useHandleEscape(isOpen, onClose);
+  const modalRef = useModalKeyboardNav(isOpen);
 
   if (!isOpen) return null;
 
@@ -33,6 +35,7 @@ const Modal = ({ isOpen, onClose, children, title, className = "", closeOnOverla
     >
       <div className="fixed inset-0 bg-black/50 transition-opacity" aria-hidden="true" />
       <div
+        ref={modalRef}
         className={`relative bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
