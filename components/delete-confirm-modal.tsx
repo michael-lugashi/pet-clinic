@@ -10,13 +10,7 @@ interface DeleteConfirmModalProps {
   isLoading?: boolean;
 }
 
-const DeleteConfirmModal = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  patient,
-  isLoading = false,
-}: DeleteConfirmModalProps) => {
+const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, patient, isLoading = false }: DeleteConfirmModalProps) => {
   const handleConfirm = () => {
     onConfirm();
   };
@@ -26,16 +20,11 @@ const DeleteConfirmModal = ({
       <div className="space-y-4">
         <p className="text-gray">
           Are you sure you want to delete the patient record for{" "}
-          <span className="font-semibold text-black">
-            {patient?.clientName}
-          </span>
+          <span className="font-semibold text-black">{patient?.clientName}</span>
           {patient?.petName && (
             <>
               {" "}
-              and their pet{" "}
-              <span className="font-semibold text-black">
-                {patient.petName}
-              </span>
+              and their pet <span className="font-semibold text-black">{patient.petName}</span>
             </>
           )}
           ? This action cannot be undone.
@@ -65,4 +54,3 @@ const DeleteConfirmModal = ({
 };
 
 export default DeleteConfirmModal;
-
