@@ -10,6 +10,7 @@ import Card from "./card";
 import ClickableSvg from "./clickable-svg";
 import SearchBar from "./search-bar";
 import PetTypeFilter from "./pet-type-filter";
+import Badge from "./badge";
 import { useAvailablePetTypes } from "@/hooks/useAvailablePetTypes";
 import { useFilteredPatients } from "@/hooks/useFilteredPatients";
 import { formatPhone } from "@/utils/formatPhone";
@@ -52,11 +53,7 @@ const headers: TableHeader<Patient>[] = [
     title: "Pet Type",
     key: "petType",
     sortFn: (a, b) => a.petType.localeCompare(b.petType),
-    displayFn: (value) => (
-      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-        {String(value)}
-      </span>
-    ),
+    displayFn: (value) => <Badge>{String(value)}</Badge>,
   },
   {
     title: "Actions",
