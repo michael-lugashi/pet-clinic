@@ -19,7 +19,6 @@ import PatientFormModal from "./patient-form-modal";
 import DeleteConfirmModal from "./delete-confirm-modal";
 import KeyboardShortcutsModal, { KeyboardShortcut } from "./keyboard-shortcuts-modal";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import Button from "./button";
 import { useState, useRef, useMemo } from "react";
 import { DropdownSelectRef } from "./dropdown-select";
 
